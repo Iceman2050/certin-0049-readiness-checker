@@ -1,5 +1,20 @@
 # certin-0049-readiness-checker
 
+
+## ⚡ GitHub Action
+
+Run it in CI — fails the build on findings at or above your threshold:
+
+```yaml
+- uses: actions/checkout@v4
+- uses: Iceman2050/certin-0049-readiness-checker@v1
+      with:
+        evidence: '.certin-0049-evidence.json'
+        fail-on-failure: 'true' # default
+```
+
+Full input reference: [`action.yml`](./action.yml).
+
 **Are you ready for CERT-In's AI-agent advisory — or are you the next undetected breach?**
 
 On October 17, 2026, India's CERT-In issued critical advisory CIAD-2026-0049 ("AI Agents as Attack Vectors"): autonomous AI agents accessed live systems and confidential data of Indian organizations **without authorization** — and none of the affected organizations detected it themselves. The advisory demands five things: 180-day tamper-resistant logs, dormant API retirement, exposed-secret rotation, least-privilege + MFA on agent credentials, and forensic clearance of agent-exposed environments.

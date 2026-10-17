@@ -1,0 +1,48 @@
+name: "CERT-In CIAD-2026-0049 Readiness Checker"
+description: >-
+  Turn CERT-In critical advisory CIAD-2026-0049 (AI Agents as Attack Vectors) into a machine-checkable audit: scores 180-day tamper-resistant logs, dormant API retirement, secret rotation, least-privilege + MFA, and forensic clearance as pass/fail/unknown from a JSON evidence file. Fails CI when any demand fails. By Ingenious AI.
+author: "Ingenious AI"
+
+branding:
+  icon: "clipboard"
+  color: "green"
+
+inputs:
+  evidence:
+    description: Path to the JSON evidence file, relative to the repository root.
+    required: false
+    default: ".certin-0049-evidence.json"
+  fail-on-failure:
+    description: "'true' (default): fail the build when any demand fails."
+    required: false
+    default: "true"
+
+outputs:
+  overall:
+    description: Overall readiness verdict (PASS, PARTIAL, FAIL, UNKNOWN).
+    value: ${{ steps.scan.outputs.overall }}
+  failed-count:
+    description: Number of failed demands.
+    value: ${{ steps.scan.outputs.failed-count }}
+  passed-count:
+    description: Number of passed demands.
+    value: ${{ steps.scan.outputs.passed-count }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Run CERT-In CIAD-2026-0049 Readiness Checker
+      id: scan
+      shell: bash
+      run: |
+        set -u
+        export FAIL_ON_F="${{ inputs.fail-on-failure }}"
+        python3 "${{ github.action_path }}/certin_0049_readiness_checker.py" --evidence "${{ github.workspace }}/${{ inputs.evidence }}" --json "$RUNNER_TEMP/scan-report.json" --markdown "$RUNNER_TEMP/scan-report.md" || true
+        echo 'CmltcG9ydCBqc29uLCBvcywgc3lzCnNldl9vcmRlciA9IHsiQ1JJVElDQUwiOiAwLCAiSElHSCI6IDEsICJNRURJVU0iOiAyLCAiTE9XIjogMywgIklORk8iOiA0fQpkZWYgd29yc3Rfb2YoZmluZGluZ3MpOgogICAgdyA9ICJOT05FIgogICAgZm9yIGYgaW4gZmluZGluZ3M6CiAgICAgICAgcyA9IGYuZ2V0KCJzZXZlcml0eSIsICJJTkZPIikKICAgICAgICBpZiBzZXZfb3JkZXIuZ2V0KHMsIDkpIDwgc2V2X29yZGVyLmdldCh3LCA5KToKICAgICAgICAgICAgdyA9IHMKICAgIHJldHVybiB3CmZhaWxfb24gPSBzZXQoeC5zdHJpcCgpLnVwcGVyKCkgZm9yIHggaW4gb3MuZW52aXJvbi5nZXQoIkZBSUxfT04iLCAiQ1JJVElDQUwsSElHSCIpLnNwbGl0KCIsIikgaWYgeC5zdHJpcCgpKQoKcmVwb3J0ID0ganNvbi5sb2FkKG9wZW4ob3MucGF0aC5qb2luKG9zLmVudmlyb25bIlJVTk5FUl9URU1QIl0sICJzY2FuLXJlcG9ydC5qc29uIikpKQpmYWlsZWRfbiA9IGludChyZXBvcnQuZ2V0KCJmYWlsZWQiLCAwKSkKcGFzc2VkX24gPSBpbnQocmVwb3J0LmdldCgicGFzc2VkIiwgMCkpCnZlcmRpY3QgPSAiRkFJTCIgaWYgZmFpbGVkX24gZWxzZSAoIlBBU1MiIGlmIHBhc3NlZF9uIGVsc2UgIlVOS05PV04iKQpmaW5kaW5ncyA9IFt7InNldmVyaXR5IjogIkhJR0giLCAiZmxhZyI6IGQuZ2V0KCJkZW1hbmQiLCAiPyIpLCAiZGVzY3JpcHRpb24iOiBkLmdldCgiZGV0YWlsIiwgIiIpfSBmb3IgZCBpbiByZXBvcnQuZ2V0KCJmaW5kaW5ncyIsIFtdKSBpZiBkLmdldCgic3RhdHVzIikgPT0gImZhaWwiXQptZF9wYXRoID0gb3MucGF0aC5qb2luKG9zLmVudmlyb25bIlJVTk5FUl9URU1QIl0sICJzY2FuLXJlcG9ydC5tZCIpCmlmIG9zLnBhdGguZXhpc3RzKG1kX3BhdGgpIGFuZCBvcy5lbnZpcm9uLmdldCgiR0lUSFVCX1NURVBfU1VNTUFSWSIpOgogICAgd2l0aCBvcGVuKG1kX3BhdGgsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGZoLCBvcGVuKG9zLmVudmlyb25bIkdJVEhVQl9TVEVQX1NVTU1BUlkiXSwgImEiLCBlbmNvZGluZz0idXRmLTgiKSBhcyBvdXQ6CiAgICAgICAgb3V0LndyaXRlKCJcbiIgKyBmaC5yZWFkKCkgKyAiXG4iKQpvdXRfcGF0aCA9IG9zLmVudmlyb24uZ2V0KCJHSVRIVUJfT1VUUFVUIiwgIiIpCmlmIG91dF9wYXRoOgogICAgd2l0aCBvcGVuKG91dF9wYXRoLCAiYSIsIGVuY29kaW5nPSJ1dGYtOCIpIGFzIGZoOgogICAgICAgIGZoLndyaXRlKCJvdmVyYWxsPSVzXG4iICUgcmVwb3J0LmdldCgib3ZlcmFsbCIsIHZlcmRpY3QpKQogICAgICAgIGZoLndyaXRlKCJmYWlsZWQtY291bnQ9JWRcbiIgJSBmYWlsZWRfbikKICAgICAgICBmaC53cml0ZSgicGFzc2VkLWNvdW50PSVkXG4iICUgcGFzc2VkX24pCiAgICAgICAgZmgud3JpdGUoImZhaWxlZD0lc1xuIiAlICgidHJ1ZSIgaWYgKGZhaWxlZF9uIGFuZCBvcy5lbnZpcm9uLmdldCgiRkFJTF9PTl9GIiwgInRydWUiKSA9PSAidHJ1ZSIpIGVsc2UgImZhbHNlIikpCnByaW50KCJvdmVyYWxsPSVzIGZhaWxlZD0lZCBwYXNzZWQ9JWQiICUgKHJlcG9ydC5nZXQoIm92ZXJhbGwiLCB2ZXJkaWN0KSwgZmFpbGVkX24sIHBhc3NlZF9uKSkKc3lzLmV4aXQoMCkK' | base64 -d > "$RUNNER_TEMP/eval.py"
+        python3 "$RUNNER_TEMP/eval.py"
+    - name: Fail on findings
+      shell: bash
+      if: steps.scan.outputs.failed == 'true'
+      run: |
+        echo "::error::CERT-In CIAD-2026-0049 Readiness Checker reported findings above the fail threshold."
+        exit 1
