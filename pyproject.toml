@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "certin-0049-readiness-checker"
+version = "1.0.0"
+description = "CERT-In CIAD-2026-0049 advisory readiness audit (stdlib only)"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+
+[project.scripts]
+certin-0049-readiness-checker = "certin_0049_readiness_checker:main"
+
+[tool.setuptools]
+py-modules = ["certin_0049_readiness_checker"]
